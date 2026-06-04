@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(dotnet build *)",
-      "Bash(dotnet test *)"
+      "Bash(dotnet test *)",
+      "Bash(cp -r /c/Users/georg/Downloads/InventoryManagementSystem/InventoryManagementSystem/InventoryManagementSystem.Data /c/Users/georg/Downloads/InventoryManagementSystem/)",
+      "Bash(cp -r /c/Users/georg/Downloads/InventoryManagementSystem/InventoryManagementSystem/InventoryManagementSystem.Services /c/Users/georg/Downloads/InventoryManagementSystem/)",
+      "Bash(cp -r /c/Users/georg/Downloads/InventoryManagementSystem/InventoryManagementSystem/InventoryManagementSystem.Tests /c/Users/georg/Downloads/InventoryManagementSystem/)",
+      "Bash(cp -r /c/Users/georg/Downloads/InventoryManagementSystem/InventoryManagementSystem/InventoryManagementSystem.Web /c/Users/georg/Downloads/InventoryManagementSystem/)",
+      "Bash(dotnet clean *)",
+      "PowerShell(dotnet build InventoryManagementSystem.sln 2>&1)",
+      "PowerShell(\\(Get-Item \"C:\\\\Users\\\\georg\\\\Downloads\\\\InventoryManagementSystem\\\\InventoryManagementSystem.Web\\\\wwwroot\\\\lib\\\\bootstrap\\\\dist\\\\css\\\\bootstrap.min.css\"\\).Length)",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\georg\\\\Downloads\\\\InventoryManagementSystem\\\\InventoryManagementSystem.Web\\\\wwwroot\" -Recurse -File | Format-Table Name, @{N='Size\\(KB\\)';E={[math]::Round\\($_.Length/1KB,1\\)}})"
     ]
   }
 }
