@@ -1,5 +1,0 @@
-@model StockTransactionFormViewModel
-@{ ViewData["Title"] = "Create Stock Transaction"; }
-<h1>Create Stock Transaction</h1>
-<form method="post" class="card card-body"><div asp-validation-summary="ModelOnly" class="text-danger"></div><div class="mb-3"><label asp-for="ProductId" class="form-label"></label><select asp-for="ProductId" asp-items="Model.Products" class="form-select"><option value="0">Choose...</option></select><span asp-validation-for="ProductId" class="text-danger"></span></div><div class="mb-3"><label asp-for="Type" class="form-label"></label><select asp-for="Type" asp-items="Html.GetEnumSelectList<StockTransactionType>()" class="form-select"></select></div><div class="mb-3"><label asp-for="Quantity" class="form-label"></label><input asp-for="Quantity" class="form-control" /><span asp-validation-for="Quantity" class="text-danger"></span></div><div class="mb-3"><label asp-for="Note" class="form-label"></label><textarea asp-for="Note" class="form-control"></textarea></div><button class="btn btn-primary">Save</button></form>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }

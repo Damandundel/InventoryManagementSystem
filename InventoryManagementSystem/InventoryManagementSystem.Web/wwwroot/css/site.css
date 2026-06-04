@@ -1,7 +1,0 @@
-body { background: #f5f7fb; }
-.hero { background: linear-gradient(135deg, #e9f0ff, #ffffff); border: 1px solid #e3e8f5; }
-.stat-card { background: white; border: 1px solid #e5e7eb; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 8px 24px rgba(15,23,42,.06); }
-.stat-card span { display:block; color:#64748b; font-size:.9rem; }
-.stat-card strong { display:block; font-size:1.8rem; color:#0f172a; }
-.table { background: white; border-radius: .75rem; overflow: hidden; }
-.footer { background: white; }

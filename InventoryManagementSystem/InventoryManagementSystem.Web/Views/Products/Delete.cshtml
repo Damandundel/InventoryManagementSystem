@@ -1,5 +1,0 @@
-@model Product
-@{ ViewData["Title"] = "Delete Product"; }
-<h1>Delete Product</h1>
-<div class="alert alert-danger">Are you sure you want to delete <strong>@Model.Name</strong>?</div>
-<form method="post"><input type="hidden" asp-for="Id" /><button class="btn btn-danger">Delete</button><a class="btn btn-outline-secondary" asp-action="Details" asp-route-id="@Model.Id">Cancel</a></form>

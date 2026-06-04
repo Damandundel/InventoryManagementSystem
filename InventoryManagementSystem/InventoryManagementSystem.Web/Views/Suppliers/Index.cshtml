@@ -1,5 +1,0 @@
-@using InventoryManagementSystem.Data.Constants
-@model IEnumerable<Supplier>
-@{ ViewData["Title"] = "Suppliers"; }
-<div class="d-flex justify-content-between"><h1>Suppliers</h1>@if(User.IsInRole(RoleConstants.Administrator)){<a class="btn btn-primary" asp-action="Create">Add</a>}</div>
-<table class="table"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th></th></tr></thead><tbody>@foreach(var item in Model){<tr><td>@item.Name</td><td>@item.Email</td><td>@item.PhoneNumber</td><td>@item.Address</td><td class="text-end">@if(User.IsInRole(RoleConstants.Administrator)){<a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@item.Id">Edit</a><form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline"><button class="btn btn-sm btn-outline-danger">Delete</button></form>}</td></tr>}</tbody></table>

@@ -1,6 +1,0 @@
-@model DashboardStatsServiceModel
-@{ ViewData["Title"] = "Admin Dashboard"; }
-<h1>Admin Dashboard</h1>
-<div class="row g-3 mb-4"><div class="col-md-3"><div class="stat-card"><span>Products</span><strong>@Model.ProductsCount</strong></div></div><div class="col-md-3"><div class="stat-card"><span>Low Stock</span><strong>@Model.LowStockCount</strong></div></div><div class="col-md-3"><div class="stat-card"><span>Suppliers</span><strong>@Model.SuppliersCount</strong></div></div><div class="col-md-3"><div class="stat-card"><span>Value</span><strong>@Model.TotalInventoryValue.ToString("C")</strong></div></div></div>
-<h3>Admin Actions</h3>
-<div class="list-group"><a class="list-group-item" asp-controller="Products" asp-action="Create">Create Product</a><a class="list-group-item" asp-controller="Categories" asp-action="Index">Manage Categories</a><a class="list-group-item" asp-controller="Warehouses" asp-action="Index">Manage Warehouses</a></div>
