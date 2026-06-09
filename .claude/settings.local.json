@@ -10,7 +10,11 @@
       "Bash(dotnet clean *)",
       "PowerShell(dotnet build InventoryManagementSystem.sln 2>&1)",
       "PowerShell(\\(Get-Item \"C:\\\\Users\\\\georg\\\\Downloads\\\\InventoryManagementSystem\\\\InventoryManagementSystem.Web\\\\wwwroot\\\\lib\\\\bootstrap\\\\dist\\\\css\\\\bootstrap.min.css\"\\).Length)",
-      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\georg\\\\Downloads\\\\InventoryManagementSystem\\\\InventoryManagementSystem.Web\\\\wwwroot\" -Recurse -File | Format-Table Name, @{N='Size\\(KB\\)';E={[math]::Round\\($_.Length/1KB,1\\)}})"
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\georg\\\\Downloads\\\\InventoryManagementSystem\\\\InventoryManagementSystem.Web\\\\wwwroot\" -Recurse -File | Format-Table Name, @{N='Size\\(KB\\)';E={[math]::Round\\($_.Length/1KB,1\\)}})",
+      "PowerShell(node --version)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:5501\" -UseBasicParsing | Select-Object StatusCode, @{N='ContentLength';E={$_.Content.Length}})",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:5501\" -UseBasicParsing; \"Status: $\\($r.StatusCode\\), Length: $\\($r.Content.Length\\)\" } catch { \"Error: $_\" })"
     ]
   }
 }

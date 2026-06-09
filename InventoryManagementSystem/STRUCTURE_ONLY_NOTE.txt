@@ -1,3 +1,0 @@
-This archive keeps the Inventory Management System folder structure and non-.cs supporting files only.
-All C# source files (.cs) were removed as requested.
-Use this as a clean project skeleton/reference structure.
