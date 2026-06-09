@@ -1,0 +1,82 @@
+using InventoryManagementSystem.Data.Constants;
+using InventoryManagementSystem.Services.Constants;
+using InventoryManagementSystem.Services.Contracts;
+using InventoryManagementSystem.Web.ViewModels;
+using InventoryManagementSystem.Web.ViewModels.StockTransaction;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace InventoryManagementSystem.Web.Controllers
+{
+    public class StockTransactionsController : Controller
+    {
+        private readonly IStockTransactionService stockTransactionService;
+        private readonly IProductService productService;
+
+        public StockTransactionsController(
+            IStockTransactionService stockTransactionService,
+            IProductService productService)
+        {
+            this.stockTransactionService = stockTransactionService;
+            this.productService = productService;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var transactions = await stockTransactionService.GetAllAsync();
+            return View(transactions);
+        }
+
+        [Authorize(Roles = RoleConstants.Administrator)]
+        public async Task<IActionResult> Create()
+        {
+            var model = new StockTransactionFormViewModel();
+            await PopulateProducts(model);
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = RoleConstants.Administrator)]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(StockTransactionFormViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                await PopulateProducts(model);
+                return View(model);
+            }
+
+            bool result;
+
+            if (model.Type == StockTransactionTypes.Add)
+            {
+                result = await stockTransactionService.AddStockAsync(model.ProductId, model.Quantity, model.Note);
+            }
+            else
+            {
+                result = await stockTransactionService.RemoveStockAsync(model.ProductId, model.Quantity, model.Note);
+            }
+
+            if (!result)
+            {
+                TempData["Error"] = model.Type == StockTransactionTypes.Remove
+                    ? MessageConstants.ErrorInsufficientStock
+                    : MessageConstants.ErrorGeneral;
+                await PopulateProducts(model);
+                return View(model);
+            }
+
+            TempData["Success"] = model.Type == StockTransactionTypes.Add
+                ? MessageConstants.SuccessStockAdd
+                : MessageConstants.SuccessStockRemove;
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task PopulateProducts(StockTransactionFormViewModel model)
+        {
+            var products = await productService.GetAllAsync();
+            model.Products = products.Select(p => new ProductDropdownViewModel { Id = p.Id, Name = p.Name });
+        }
+    }
+}
