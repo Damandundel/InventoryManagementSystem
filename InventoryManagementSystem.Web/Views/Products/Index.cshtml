@@ -1,0 +1,149 @@
+@model IEnumerable<ProductServiceModel>
+@{
+    ViewData["Title"] = "Products";
+    var categories = Model.Select(p => p.CategoryName).Where(c => !string.IsNullOrEmpty(c)).Distinct().OrderBy(c => c).ToList();
+    var warehouses = Model.Select(p => p.WarehouseName).Where(w => !string.IsNullOrEmpty(w)).Distinct().OrderBy(w => w).ToList();
+}
+<div class="page-header">
+    <h1><i class="bi bi-box-seam me-2"></i>Products</h1>
+    @if (User.IsInRole(RoleConstants.Administrator))
+    {
+        <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg me-1"></i> Add Product</a>
+    }
+</div>
+
+<!-- Filter Bar -->
+<div class="card mb-4">
+    <div class="card-body py-3">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label"><i class="bi bi-search me-1"></i>Search</label>
+                <input id="filterSearch" class="form-control" placeholder="Filter by name..." />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label"><i class="bi bi-tag me-1"></i>Category</label>
+                <select id="filterCategory" class="form-select">
+                    <option value="">All Categories</option>
+                    @foreach (var cat in categories)
+                    {
+                        <option value="@cat">@cat</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label"><i class="bi bi-building me-1"></i>Warehouse</label>
+                <select id="filterWarehouse" class="form-select">
+                    <option value="">All Warehouses</option>
+                    @foreach (var wh in warehouses)
+                    {
+                        <option value="@wh">@wh</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button id="clearFilters" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-x-circle me-1"></i>Clear
+                </button>
+            </div>
+        </div>
+        <div class="mt-2">
+            <small id="filterCount" style="color: var(--text-2);"></small>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover" id="productsTable">
+        <thead class="table-dark">
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Supplier</th>
+                <th>Warehouse</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Model)
+            {
+                <tr data-name="@product.Name.ToLower()" data-category="@product.CategoryName" data-warehouse="@product.WarehouseName">
+                    <td class="fw-semibold">@product.Name</td>
+                    <td><span class="badge bg-info">@product.CategoryName</span></td>
+                    <td>@product.SupplierName</td>
+                    <td>@product.WarehouseName</td>
+                    <td class="fw-semibold">@product.Price.ToString("C")</td>
+                    <td>
+                        @if (product.Quantity < 10)
+                        {
+                            <span class="badge bg-danger">@product.Quantity</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">@product.Quantity</span>
+                        }
+                    </td>
+                    <td>
+                        <a class="btn btn-sm btn-info" asp-action="Details" asp-route-id="@product.Id"><i class="bi bi-eye"></i></a>
+                        @if (User.IsInRole(RoleConstants.Administrator))
+                        {
+                            <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@product.Id"><i class="bi bi-pencil"></i></a>
+                            <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@product.Id"><i class="bi bi-trash"></i></a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@if (!Model.Any())
+{
+    <div class="alert alert-info mt-3"><i class="bi bi-info-circle me-1"></i> No products found.</div>
+}
+<div id="noFilterResults" class="alert alert-info mt-3" style="display:none;">
+    <i class="bi bi-info-circle me-1"></i> No products match your filters.
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            var total = $('#productsTable tbody tr').length;
+
+            function applyFilters() {
+                var search = $('#filterSearch').val().toLowerCase();
+                var category = $('#filterCategory').val();
+                var warehouse = $('#filterWarehouse').val();
+                var visible = 0;
+
+                $('#productsTable tbody tr').each(function () {
+                    var row = $(this);
+                    var matchName = !search || row.data('name').indexOf(search) !== -1;
+                    var matchCat = !category || row.data('category') === category;
+                    var matchWh = !warehouse || row.data('warehouse') === warehouse;
+
+                    if (matchName && matchCat && matchWh) {
+                        row.show();
+                        visible++;
+                    } else {
+                        row.hide();
+                    }
+                });
+
+                $('#filterCount').text('Showing ' + visible + ' of ' + total + ' products');
+                $('#noFilterResults').toggle(visible === 0 && total > 0);
+            }
+
+            $('#filterSearch').on('keyup', applyFilters);
+            $('#filterCategory, #filterWarehouse').on('change', applyFilters);
+            $('#clearFilters').on('click', function () {
+                $('#filterSearch').val('');
+                $('#filterCategory').val('');
+                $('#filterWarehouse').val('');
+                applyFilters();
+            });
+
+            if (total > 0) applyFilters();
+        });
+    </script>
+}

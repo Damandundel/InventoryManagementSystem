@@ -1,0 +1,49 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-5">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="bi bi-person-plus" style="font-size: 2.5rem;"></i>
+                <h2 class="mt-2">Create Account</h2>
+                <p class="mb-0 opacity-75">Join the inventory system</p>
+            </div>
+            <div class="card-body">
+                <form asp-action="Register" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="mb-3">
+                        <label asp-for="FullName" class="form-label"><i class="bi bi-person me-1"></i> Full Name</label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"><i class="bi bi-envelope me-1"></i> Email</label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label"><i class="bi bi-lock me-1"></i> Password</label>
+                        <input asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="ConfirmPassword" class="form-label"><i class="bi bi-lock-fill me-1"></i> Confirm Password</label>
+                        <input asp-for="ConfirmPassword" class="form-control" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 btn-lg">
+                        <i class="bi bi-person-plus me-1"></i> Register
+                    </button>
+                </form>
+                <hr />
+                <p class="text-center mb-0">Already have an account? <a asp-action="Login" style="color: var(--accent-h); font-weight: 600;">Login here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,271 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<section class="hero rounded-4 p-5 mb-4">
+    <h1 class="display-5 fw-bold">Inventory Management</h1>
+    <p class="lead">Track products, suppliers, warehouses and stock movements from one place.</p>
+    <div class="d-flex gap-2 flex-wrap mt-3">
+        <a class="btn-hero" asp-controller="Products" asp-action="Index">
+            <i class="bi bi-box-seam"></i> View Products
+        </a>
+        <a class="btn-hero" asp-controller="Home" asp-action="Statistics" style="background: var(--green);">
+            <i class="bi bi-bar-chart"></i> Statistics
+        </a>
+    </div>
+</section>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6 animate-in">
+        <a asp-controller="Products" asp-action="Index" style="text-decoration:none;">
+            <div class="stat-card stat-orange" style="cursor:pointer;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="stat-label">Products</div>
+                        <div class="stat-value">@Model.TotalProducts</div>
+                    </div>
+                    <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+                </div>
+                <div style="margin-top:.5rem; font-size:.72rem; color: var(--text-3);">
+                    <i class="bi bi-arrow-right"></i> View all products
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-sm-6 animate-in">
+        <a asp-controller="Categories" asp-action="Index" style="text-decoration:none;">
+            <div class="stat-card stat-pink" style="cursor:pointer;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="stat-label">Categories</div>
+                        <div class="stat-value">@Model.TotalCategories</div>
+                    </div>
+                    <div class="stat-icon"><i class="bi bi-tags"></i></div>
+                </div>
+                <div style="margin-top:.5rem; font-size:.72rem; color: var(--text-3);">
+                    <i class="bi bi-arrow-right"></i> Manage categories
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-sm-6 animate-in">
+        <a asp-controller="Suppliers" asp-action="Index" style="text-decoration:none;">
+            <div class="stat-card stat-purple" style="cursor:pointer;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="stat-label">Suppliers</div>
+                        <div class="stat-value">@Model.TotalSuppliers</div>
+                    </div>
+                    <div class="stat-icon"><i class="bi bi-truck"></i></div>
+                </div>
+                <div style="margin-top:.5rem; font-size:.72rem; color: var(--text-3);">
+                    <i class="bi bi-arrow-right"></i> View suppliers
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-sm-6 animate-in">
+        <a asp-controller="Home" asp-action="Statistics" style="text-decoration:none;">
+            <div class="stat-card stat-teal" style="cursor:pointer;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="stat-label">Inventory Value</div>
+                        <div class="stat-value" style="font-size:1.3rem;">@Model.TotalInventoryValue.ToString("C")</div>
+                    </div>
+                    <div class="stat-icon"><i class="bi bi-currency-dollar"></i></div>
+                </div>
+                <div style="margin-top:.5rem; font-size:.72rem; color: var(--text-3);">
+                    <i class="bi bi-arrow-right"></i> Full statistics
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+@if (User.IsInRole(RoleConstants.Administrator))
+{
+    <!-- Quick Actions -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-2 col-4">
+                    <a asp-controller="Products" asp-action="Create" class="quick-action-btn">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>Add Product</span>
+                    </a>
+                </div>
+                <div class="col-md-2 col-4">
+                    <a asp-controller="StockTransactions" asp-action="Create" class="quick-action-btn">
+                        <i class="bi bi-arrow-left-right"></i>
+                        <span>Stock Move</span>
+                    </a>
+                </div>
+                <div class="col-md-2 col-4">
+                    <a asp-controller="Categories" asp-action="Create" class="quick-action-btn">
+                        <i class="bi bi-tag"></i>
+                        <span>Add Category</span>
+                    </a>
+                </div>
+                <div class="col-md-2 col-4">
+                    <a asp-controller="Suppliers" asp-action="Create" class="quick-action-btn">
+                        <i class="bi bi-truck"></i>
+                        <span>Add Supplier</span>
+                    </a>
+                </div>
+                <div class="col-md-2 col-4">
+                    <a asp-controller="Warehouses" asp-action="Create" class="quick-action-btn">
+                        <i class="bi bi-building"></i>
+                        <span>Add Warehouse</span>
+                    </a>
+                </div>
+                <div class="col-md-2 col-4">
+                    <a asp-controller="Home" asp-action="Statistics" class="quick-action-btn">
+                        <i class="bi bi-bar-chart"></i>
+                        <span>Statistics</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Product Search -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-search me-2"></i>Product Search</h5>
+    </div>
+    <div class="card-body">
+        <input id="liveSearch" class="form-control" placeholder="Type to search products..." />
+        <div id="liveSearchResults" class="list-group mt-3"></div>
+    </div>
+</div>
+
+@if (Model.LowStockProducts.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Low Stock Alerts</h5>
+                <span class="badge bg-danger">@Model.LowStockProducts.Count() items below 10</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Warehouse</th>
+                        <th>Quantity</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.LowStockProducts)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@p.Name</td>
+                            <td><span class="badge bg-info">@p.CategoryName</span></td>
+                            <td>@p.WarehouseName</td>
+                            <td><span class="badge bg-danger">@p.Quantity</span></td>
+                            <td>
+                                <a class="btn btn-sm btn-info" asp-controller="Products" asp-action="Details" asp-route-id="@p.Id">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                                @if (User.IsInRole(RoleConstants.Administrator))
+                                {
+                                    <a class="btn btn-sm btn-success" asp-controller="StockTransactions" asp-action="Create">
+                                        <i class="bi bi-plus"></i> Restock
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@if (Model.RecentTransactions.Any())
+{
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Transactions</h5>
+                <a asp-controller="StockTransactions" asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                    View All <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Product</th>
+                        <th>Type</th>
+                        <th>Quantity</th>
+                        <th>Date</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model.RecentTransactions)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@t.ProductName</td>
+                            <td>
+                                @if (t.Type == StockTransactionTypes.Add)
+                                {
+                                    <span class="badge bg-success"><i class="bi bi-plus-circle"></i> Add</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning"><i class="bi bi-dash-circle"></i> Remove</span>
+                                }
+                            </td>
+                            <td>@t.QuantityChanged</td>
+                            <td style="color: var(--text-2);">@t.CreatedOn.ToString("g")</td>
+                            <td style="color: var(--text-2);">@t.Note</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        $(function () {
+            var timer;
+            $('#liveSearch').on('keyup', function () {
+                clearTimeout(timer);
+                var query = $(this).val();
+                timer = setTimeout(function () {
+                    $.get('/api/ProductsApi/search?query=' + encodeURIComponent(query), function (data) {
+                        var container = $('#liveSearchResults');
+                        container.empty();
+                        if (data.length === 0) {
+                            container.append('<div class="list-group-item text-muted"><i class="bi bi-info-circle me-1"></i> No products found.</div>');
+                            return;
+                        }
+                        $.each(data, function (i, p) {
+                            container.append(
+                                '<a href="/Products/Details/' + p.id + '" class="list-group-item list-group-item-action">' +
+                                '<strong>' + $('<span>').text(p.name).html() + '</strong> - $' + p.price.toFixed(2) +
+                                ' <span class="badge bg-secondary">' + $('<span>').text(p.categoryName).html() + '</span>' +
+                                ' <span class="float-end">Qty: ' + p.quantity + '</span></a>'
+                            );
+                        });
+                    });
+                }, 300);
+            });
+        });
+    </script>
+}

@@ -1,0 +1,244 @@
+@model StatisticsViewModel
+@{
+    ViewData["Title"] = "Statistics";
+}
+
+<div class="page-header">
+    <h1><i class="bi bi-bar-chart me-2"></i>Statistics</h1>
+    <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">
+        <i class="bi bi-arrow-left me-1"></i> Dashboard
+    </a>
+</div>
+
+<!-- Overview Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-3 col-sm-6 animate-in">
+        <div class="stat-card stat-orange">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-label">Inventory Value</div>
+                    <div class="stat-value" style="font-size:1.3rem;">@Model.TotalInventoryValue.ToString("C")</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-currency-dollar"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6 animate-in">
+        <div class="stat-card stat-pink">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-label">Total Stock</div>
+                    <div class="stat-value" style="font-size:1.3rem;">@Model.TotalStockQuantity.ToString("N0")</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-archive"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6 animate-in">
+        <div class="stat-card stat-purple">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-label">Products</div>
+                    <div class="stat-value" style="font-size:1.3rem;">@Model.TotalProducts</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6 animate-in">
+        <div class="stat-card stat-teal">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-label">Low Stock Items</div>
+                    <div class="stat-value" style="font-size:1.3rem;">@Model.LowStockCount</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-exclamation-triangle"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mini Stats Row -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4 animate-in">
+        <a asp-controller="Categories" asp-action="Index" style="text-decoration:none;">
+            <div class="card text-center p-3" style="cursor:pointer;">
+                <div style="font-size:1.6rem;"><i class="bi bi-tags" style="color: var(--accent);"></i></div>
+                <div class="stat-label mt-1">Categories</div>
+                <div class="fw-bold" style="font-size:1.2rem; font-family: var(--mono);">@Model.TotalCategories</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4 animate-in">
+        <a asp-controller="Suppliers" asp-action="Index" style="text-decoration:none;">
+            <div class="card text-center p-3" style="cursor:pointer;">
+                <div style="font-size:1.6rem;"><i class="bi bi-truck" style="color: var(--amber);"></i></div>
+                <div class="stat-label mt-1">Suppliers</div>
+                <div class="fw-bold" style="font-size:1.2rem; font-family: var(--mono);">@Model.TotalSuppliers</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4 animate-in">
+        <a asp-controller="Warehouses" asp-action="Index" style="text-decoration:none;">
+            <div class="card text-center p-3" style="cursor:pointer;">
+                <div style="font-size:1.6rem;"><i class="bi bi-building" style="color: var(--green);"></i></div>
+                <div class="stat-label mt-1">Warehouses</div>
+                <div class="fw-bold" style="font-size:1.2rem; font-family: var(--mono);">@Model.TotalWarehouses</div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Category Breakdown -->
+@if (Model.ByCategory.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-tags me-2"></i>Breakdown by Category</h5>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Category</th>
+                        <th>Products</th>
+                        <th>Total Quantity</th>
+                        <th>Total Value</th>
+                        <th>Share</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var totalCatValue = Model.ByCategory.Sum(c => c.TotalValue);
+                    }
+                    @foreach (var cat in Model.ByCategory)
+                    {
+                        var pct = totalCatValue > 0 ? (cat.TotalValue / totalCatValue * 100) : 0;
+                        <tr>
+                            <td class="fw-semibold">
+                                <i class="bi bi-tag me-1" style="color: var(--accent);"></i>@cat.Name
+                            </td>
+                            <td><span class="badge bg-info">@cat.ProductCount</span></td>
+                            <td>@cat.TotalQuantity.ToString("N0")</td>
+                            <td class="fw-semibold">@cat.TotalValue.ToString("C")</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div style="flex:1; height:6px; background:var(--bg3); border-radius:3px; overflow:hidden;">
+                                        <div style="width:@(pct.ToString("F1"))%; height:100%; background:var(--accent); border-radius:3px;"></div>
+                                    </div>
+                                    <span style="font-size:.75rem; color:var(--text-3); min-width:38px; font-family:var(--mono);">@pct.ToString("F1")%</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<!-- Warehouse Breakdown -->
+@if (Model.ByWarehouse.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-building me-2"></i>Breakdown by Warehouse</h5>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Warehouse</th>
+                        <th>Location</th>
+                        <th>Products</th>
+                        <th>Total Quantity</th>
+                        <th>Total Value</th>
+                        <th>Share</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var totalWhValue = Model.ByWarehouse.Sum(w => w.TotalValue);
+                    }
+                    @foreach (var wh in Model.ByWarehouse)
+                    {
+                        var pct = totalWhValue > 0 ? (wh.TotalValue / totalWhValue * 100) : 0;
+                        <tr>
+                            <td class="fw-semibold">
+                                <i class="bi bi-building me-1" style="color: var(--green);"></i>@wh.Name
+                            </td>
+                            <td style="color: var(--text-2);">@wh.Location</td>
+                            <td><span class="badge bg-info">@wh.ProductCount</span></td>
+                            <td>@wh.TotalQuantity.ToString("N0")</td>
+                            <td class="fw-semibold">@wh.TotalValue.ToString("C")</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div style="flex:1; height:6px; background:var(--bg3); border-radius:3px; overflow:hidden;">
+                                        <div style="width:@(pct.ToString("F1"))%; height:100%; background:var(--green); border-radius:3px;"></div>
+                                    </div>
+                                    <span style="font-size:.75rem; color:var(--text-3); min-width:38px; font-family:var(--mono);">@pct.ToString("F1")%</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<!-- Top Products by Value -->
+@if (Model.TopProductsByValue.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-trophy me-2"></i>Top 10 Products by Total Value</h5>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Unit Price</th>
+                        <th>Quantity</th>
+                        <th>Total Value</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ var rank = 1; }
+                    @foreach (var p in Model.TopProductsByValue)
+                    {
+                        <tr>
+                            <td>
+                                @if (rank <= 3)
+                                {
+                                    <span style="font-size:1.1rem;">
+                                        @(rank == 1 ? "\U0001f947" : rank == 2 ? "\U0001f948" : "\U0001f949")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@rank</span>
+                                }
+                            </td>
+                            <td class="fw-semibold">@p.Name</td>
+                            <td><span class="badge bg-info">@p.CategoryName</span></td>
+                            <td>@p.Price.ToString("C")</td>
+                            <td>@p.Quantity.ToString("N0")</td>
+                            <td class="fw-bold" style="color: var(--accent-h); font-family: var(--mono);">@p.TotalValue.ToString("C")</td>
+                            <td>
+                                <a class="btn btn-sm btn-info" asp-controller="Products" asp-action="Details" asp-route-id="@p.Id">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        rank++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

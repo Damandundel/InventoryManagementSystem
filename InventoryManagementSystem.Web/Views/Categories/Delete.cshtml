@@ -1,0 +1,33 @@
+@model CategoryDeleteViewModel
+@{
+    ViewData["Title"] = "Delete Category";
+}
+<div class="page-header">
+    <h1><i class="bi bi-trash me-2" style="color: #EF4444;"></i>Delete Category</h1>
+</div>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body p-4">
+                <div class="delete-warning mb-4">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    Are you sure you want to delete <strong>@Model.Name</strong>?
+                    @if (Model.ProductCount > 0)
+                    {
+                        <br /><text>This category has </text><strong>@Model.ProductCount</strong><text> products associated with it.</text>
+                    }
+                </div>
+                <dl class="row">
+                    <dt class="col-sm-3">Name</dt>
+                    <dd class="col-sm-9">@Model.Name</dd>
+                </dl>
+                <form asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger"><i class="bi bi-trash me-1"></i> Confirm Delete</button>
+                        <a class="btn btn-outline-secondary" asp-action="Index"><i class="bi bi-x-lg me-1"></i> Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
