@@ -14,6 +14,9 @@ namespace InventoryManagementSystem.Data.Models
         [MaxLength(500)]
         public string? Description { get; set; }
 
+        [Required]
+        public string OwnerId { get; set; } = string.Empty;
+
         public bool IsDeleted { get; set; }
 
         public ICollection<Product> Products { get; set; } = new List<Product>();

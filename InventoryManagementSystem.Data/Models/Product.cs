@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagementSystem.Data.Models
 {
@@ -16,7 +17,7 @@ namespace InventoryManagementSystem.Data.Models
         public string? Description { get; set; }
 
         [Required]
-        [Column(TypeName = "decimal(18,2)")]
+        [Precision(18, 2)]
         public decimal Price { get; set; }
 
         [Required]
@@ -39,6 +40,9 @@ namespace InventoryManagementSystem.Data.Models
 
         [ForeignKey(nameof(WarehouseId))]
         public Warehouse Warehouse { get; set; } = null!;
+
+        [Required]
+        public string OwnerId { get; set; } = string.Empty;
 
         public bool IsDeleted { get; set; }
 

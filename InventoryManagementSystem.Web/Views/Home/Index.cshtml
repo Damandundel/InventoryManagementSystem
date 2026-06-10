@@ -84,15 +84,13 @@
     </div>
 </div>
 
-@if (User.IsInRole(RoleConstants.Administrator))
-{
-    <!-- Quick Actions -->
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
-        </div>
-        <div class="card-body">
-            <div class="row g-3">
+<!-- Quick Actions -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
                 <div class="col-md-2 col-4">
                     <a asp-controller="Products" asp-action="Create" class="quick-action-btn">
                         <i class="bi bi-plus-circle"></i>
@@ -132,7 +130,6 @@
             </div>
         </div>
     </div>
-}
 
 <!-- Product Search -->
 <div class="card mb-4">
@@ -168,21 +165,26 @@
                 <tbody>
                     @foreach (var p in Model.LowStockProducts)
                     {
-                        <tr>
-                            <td class="fw-semibold">@p.Name</td>
-                            <td><span class="badge bg-info">@p.CategoryName</span></td>
-                            <td>@p.WarehouseName</td>
+                        <tr class="clickable-row" data-href="@Url.Action("Details", "Products", new { id = p.Id })">
+                            <td class="fw-semibold">
+                                <a class="entity-link" asp-controller="Products" asp-action="Details" asp-route-id="@p.Id">@p.Name</a>
+                            </td>
+                            <td>
+                                <a class="entity-link" asp-controller="Categories" asp-action="Details" asp-route-id="@p.CategoryId">
+                                    <span class="badge bg-info">@p.CategoryName</span>
+                                </a>
+                            </td>
+                            <td>
+                                <a class="entity-link" asp-controller="Warehouses" asp-action="Details" asp-route-id="@p.WarehouseId">@p.WarehouseName</a>
+                            </td>
                             <td><span class="badge bg-danger">@p.Quantity</span></td>
                             <td>
                                 <a class="btn btn-sm btn-info" asp-controller="Products" asp-action="Details" asp-route-id="@p.Id">
                                     <i class="bi bi-eye"></i> View
                                 </a>
-                                @if (User.IsInRole(RoleConstants.Administrator))
-                                {
-                                    <a class="btn btn-sm btn-success" asp-controller="StockTransactions" asp-action="Create">
-                                        <i class="bi bi-plus"></i> Restock
-                                    </a>
-                                }
+                                <a class="btn btn-sm btn-success" asp-controller="StockTransactions" asp-action="Create" asp-route-productId="@p.Id">
+                                    <i class="bi bi-plus"></i> Restock
+                                </a>
                             </td>
                         </tr>
                     }
@@ -217,8 +219,10 @@
                 <tbody>
                     @foreach (var t in Model.RecentTransactions)
                     {
-                        <tr>
-                            <td class="fw-semibold">@t.ProductName</td>
+                        <tr class="clickable-row" data-href="@Url.Action("Details", "Products", new { id = t.ProductId })">
+                            <td class="fw-semibold">
+                                <a class="entity-link" asp-controller="Products" asp-action="Details" asp-route-id="@t.ProductId">@t.ProductName</a>
+                            </td>
                             <td>
                                 @if (t.Type == StockTransactionTypes.Add)
                                 {
@@ -229,9 +233,9 @@
                                     <span class="badge bg-warning"><i class="bi bi-dash-circle"></i> Remove</span>
                                 }
                             </td>
-                            <td>@t.QuantityChanged</td>
+                            <td class="fw-semibold">@(t.Type == StockTransactionTypes.Add ? "+" : "-")@t.QuantityChanged</td>
                             <td style="color: var(--text-2);">@t.CreatedOn.ToString("g")</td>
-                            <td style="color: var(--text-2);">@t.Note</td>
+                            <td style="color: var(--text-2);">@(string.IsNullOrWhiteSpace(t.Note) ? "—" : t.Note)</td>
                         </tr>
                     }
                 </tbody>

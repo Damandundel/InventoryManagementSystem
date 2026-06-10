@@ -1,35 +1,61 @@
-using InventoryManagementSystem.Data.Constants;
 using InventoryManagementSystem.Services.Constants;
 using InventoryManagementSystem.Services.Contracts;
 using InventoryManagementSystem.Web.ViewModels.Warehouse;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagementSystem.Web.Controllers
 {
-    public class WarehousesController : Controller
+    public class WarehousesController : BaseController
     {
         private readonly IWarehouseService warehouseService;
+        private readonly IProductService productService;
 
-        public WarehousesController(IWarehouseService warehouseService)
+        public WarehousesController(
+            IWarehouseService warehouseService,
+            IProductService productService)
         {
             this.warehouseService = warehouseService;
+            this.productService = productService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var warehouses = await warehouseService.GetAllAsync();
+            var warehouses = await warehouseService.GetAllAsync(OwnerId);
             return View(warehouses);
         }
 
-        [Authorize(Roles = RoleConstants.Administrator)]
+        public async Task<IActionResult> Details(int id)
+        {
+            var warehouse = await warehouseService.GetByIdAsync(id, OwnerId);
+
+            if (warehouse == null)
+            {
+                TempData["Error"] = string.Format(MessageConstants.ErrorNotFound, "warehouse");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var products = await productService.GetByWarehouseAsync(id, OwnerId);
+
+            var model = new WarehouseDetailsViewModel
+            {
+                Id = warehouse.Id,
+                Name = warehouse.Name,
+                Location = warehouse.Location,
+                ProductCount = warehouse.ProductCount,
+                TotalQuantity = products.Sum(p => p.Quantity),
+                TotalValue = products.Sum(p => p.Price * p.Quantity),
+                Products = products
+            };
+
+            return View(model);
+        }
+
         public IActionResult Create()
         {
             return View(new WarehouseFormViewModel());
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleConstants.Administrator)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WarehouseFormViewModel model)
         {
@@ -38,17 +64,16 @@ namespace InventoryManagementSystem.Web.Controllers
                 return View(model);
             }
 
-            await warehouseService.CreateAsync(model.Name, model.Location);
+            await warehouseService.CreateAsync(OwnerId, model.Name, model.Location);
 
             TempData["Success"] = string.Format(MessageConstants.SuccessCreate, "Warehouse");
 
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = RoleConstants.Administrator)]
         public async Task<IActionResult> Edit(int id)
         {
-            var warehouse = await warehouseService.GetByIdAsync(id);
+            var warehouse = await warehouseService.GetByIdAsync(id, OwnerId);
 
             if (warehouse == null)
             {
@@ -67,7 +92,6 @@ namespace InventoryManagementSystem.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleConstants.Administrator)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, WarehouseFormViewModel model)
         {
@@ -76,7 +100,7 @@ namespace InventoryManagementSystem.Web.Controllers
                 return View(model);
             }
 
-            var result = await warehouseService.EditAsync(id, model.Name, model.Location);
+            var result = await warehouseService.EditAsync(id, OwnerId, model.Name, model.Location);
 
             if (!result)
             {
@@ -89,10 +113,9 @@ namespace InventoryManagementSystem.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = RoleConstants.Administrator)]
         public async Task<IActionResult> Delete(int id)
         {
-            var warehouse = await warehouseService.GetByIdAsync(id);
+            var warehouse = await warehouseService.GetByIdAsync(id, OwnerId);
 
             if (warehouse == null)
             {
@@ -112,11 +135,10 @@ namespace InventoryManagementSystem.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleConstants.Administrator)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var result = await warehouseService.DeleteAsync(id);
+            var result = await warehouseService.DeleteAsync(id, OwnerId);
 
             if (!result)
             {

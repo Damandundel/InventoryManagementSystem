@@ -6,10 +6,7 @@
 }
 <div class="page-header">
     <h1><i class="bi bi-box-seam me-2"></i>Products</h1>
-    @if (User.IsInRole(RoleConstants.Administrator))
-    {
-        <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg me-1"></i> Add Product</a>
-    }
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg me-1"></i> Add Product</a>
 </div>
 
 <!-- Filter Bar -->
@@ -68,11 +65,22 @@
         <tbody>
             @foreach (var product in Model)
             {
-                <tr data-name="@product.Name.ToLower()" data-category="@product.CategoryName" data-warehouse="@product.WarehouseName">
-                    <td class="fw-semibold">@product.Name</td>
-                    <td><span class="badge bg-info">@product.CategoryName</span></td>
-                    <td>@product.SupplierName</td>
-                    <td>@product.WarehouseName</td>
+                <tr class="clickable-row" data-href="@Url.Action("Details", new { id = product.Id })"
+                    data-name="@product.Name.ToLower()" data-category="@product.CategoryName" data-warehouse="@product.WarehouseName">
+                    <td class="fw-semibold">
+                        <a class="entity-link" asp-action="Details" asp-route-id="@product.Id">@product.Name</a>
+                    </td>
+                    <td>
+                        <a class="entity-link" asp-controller="Categories" asp-action="Details" asp-route-id="@product.CategoryId">
+                            <span class="badge bg-info">@product.CategoryName</span>
+                        </a>
+                    </td>
+                    <td>
+                        <a class="entity-link" asp-controller="Suppliers" asp-action="Details" asp-route-id="@product.SupplierId">@product.SupplierName</a>
+                    </td>
+                    <td>
+                        <a class="entity-link" asp-controller="Warehouses" asp-action="Details" asp-route-id="@product.WarehouseId">@product.WarehouseName</a>
+                    </td>
                     <td class="fw-semibold">@product.Price.ToString("C")</td>
                     <td>
                         @if (product.Quantity < 10)
@@ -86,11 +94,8 @@
                     </td>
                     <td>
                         <a class="btn btn-sm btn-info" asp-action="Details" asp-route-id="@product.Id"><i class="bi bi-eye"></i></a>
-                        @if (User.IsInRole(RoleConstants.Administrator))
-                        {
-                            <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@product.Id"><i class="bi bi-pencil"></i></a>
-                            <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@product.Id"><i class="bi bi-trash"></i></a>
-                        }
+                        <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@product.Id"><i class="bi bi-pencil"></i></a>
+                        <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@product.Id"><i class="bi bi-trash"></i></a>
                     </td>
                 </tr>
             }

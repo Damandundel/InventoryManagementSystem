@@ -3,12 +3,11 @@ using InventoryManagementSystem.Services.Constants;
 using InventoryManagementSystem.Services.Contracts;
 using InventoryManagementSystem.Web.ViewModels;
 using InventoryManagementSystem.Web.ViewModels.StockTransaction;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagementSystem.Web.Controllers
 {
-    public class StockTransactionsController : Controller
+    public class StockTransactionsController : BaseController
     {
         private readonly IStockTransactionService stockTransactionService;
         private readonly IProductService productService;
@@ -23,20 +22,27 @@ namespace InventoryManagementSystem.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var transactions = await stockTransactionService.GetAllAsync();
+            var transactions = await stockTransactionService.GetAllAsync(OwnerId);
             return View(transactions);
         }
 
-        [Authorize(Roles = RoleConstants.Administrator)]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int? productId)
         {
-            var model = new StockTransactionFormViewModel();
+            var model = new StockTransactionFormViewModel
+            {
+                Type = StockTransactionTypes.Add
+            };
+
+            if (productId.HasValue && await productService.ExistsAsync(productId.Value, OwnerId))
+            {
+                model.ProductId = productId.Value;
+            }
+
             await PopulateProducts(model);
             return View(model);
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleConstants.Administrator)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(StockTransactionFormViewModel model)
         {
@@ -50,11 +56,11 @@ namespace InventoryManagementSystem.Web.Controllers
 
             if (model.Type == StockTransactionTypes.Add)
             {
-                result = await stockTransactionService.AddStockAsync(model.ProductId, model.Quantity, model.Note);
+                result = await stockTransactionService.AddStockAsync(model.ProductId, model.Quantity, model.Note, OwnerId);
             }
             else
             {
-                result = await stockTransactionService.RemoveStockAsync(model.ProductId, model.Quantity, model.Note);
+                result = await stockTransactionService.RemoveStockAsync(model.ProductId, model.Quantity, model.Note, OwnerId);
             }
 
             if (!result)
@@ -75,7 +81,7 @@ namespace InventoryManagementSystem.Web.Controllers
 
         private async Task PopulateProducts(StockTransactionFormViewModel model)
         {
-            var products = await productService.GetAllAsync();
+            var products = await productService.GetAllAsync(OwnerId);
             model.Products = products.Select(p => new ProductDropdownViewModel { Id = p.Id, Name = p.Name });
         }
     }

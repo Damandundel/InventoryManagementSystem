@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<InventoryDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
@@ -69,6 +69,9 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
+    var dbContext = services.GetRequiredService<InventoryDbContext>();
+    await dbContext.Database.MigrateAsync();
+
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
@@ -96,6 +99,13 @@ using (var scope = app.Services.CreateScope())
         {
             await userManager.AddToRoleAsync(adminUser, RoleConstants.Administrator);
         }
+    }
+
+    // Give the example admin account a ready-made demo catalog. Newly registered
+    // users start empty and build their own inventory from scratch.
+    if (adminUser != null)
+    {
+        await DbInitializer.SeedDemoDataAsync(dbContext, adminUser.Id);
     }
 }
 

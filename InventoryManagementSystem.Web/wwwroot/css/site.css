@@ -369,6 +369,13 @@ td .btn + .btn { margin-left: .25rem; }
 
 .form-select {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2371717A' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.9rem center;
+    background-size: 14px 12px;
+    padding-right: 2.5rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 .form-select option { background: var(--bg2); color: var(--text); }
 
@@ -550,6 +557,46 @@ td .btn + .btn { margin-left: .25rem; }
 dl.row dt { color: var(--text-3); font-size: .82rem; font-weight: 600; }
 dl.row dd { color: var(--text); }
 hr { border-color: var(--border); opacity: 1; }
+
+/* ── Clickable Rows ────────────────────────────────── */
+tr.clickable-row { cursor: pointer; }
+tr.clickable-row:hover > * {
+    background-color: var(--accent-bg) !important;
+    --bs-table-hover-bg: var(--accent-bg);
+}
+
+/* ── Entity Links (inline links inside tables / detail lists) ── */
+.entity-link {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: inherit;
+    transition: color .15s var(--ease);
+}
+.entity-link:hover { color: var(--accent-h); }
+.entity-link .badge { cursor: pointer; }
+td.fw-semibold .entity-link { color: var(--text); }
+td.fw-semibold .entity-link:hover { color: var(--accent-h); }
+
+/* ── Breadcrumbs ───────────────────────────────────── */
+.breadcrumb {
+    font-size: .82rem;
+    margin-bottom: 1rem;
+    padding: 0;
+    background: transparent;
+}
+.breadcrumb-item a {
+    color: var(--text-3);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color .15s var(--ease);
+}
+.breadcrumb-item a:hover { color: var(--accent-h); }
+.breadcrumb-item.active { color: var(--text-2); font-weight: 600; }
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "/";
+    color: var(--text-3);
+    padding: 0 .5rem;
+}
 
 /* ── Responsive ────────────────────────────────────── */
 @media (max-width: 576px) {

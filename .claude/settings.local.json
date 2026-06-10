@@ -14,7 +14,31 @@
       "PowerShell(node --version)",
       "mcp__Claude_in_Chrome__tabs_context_mcp",
       "PowerShell(Invoke-WebRequest -Uri \"http://localhost:5501\" -UseBasicParsing | Select-Object StatusCode, @{N='ContentLength';E={$_.Content.Length}})",
-      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:5501\" -UseBasicParsing; \"Status: $\\($r.StatusCode\\), Length: $\\($r.Content.Length\\)\" } catch { \"Error: $_\" })"
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:5501\" -UseBasicParsing; \"Status: $\\($r.StatusCode\\), Length: $\\($r.Content.Length\\)\" } catch { \"Error: $_\" })",
+      "Bash(dotnet --version)",
+      "Bash(dotnet --list-sdks)",
+      "Bash(sqllocaldb info *)",
+      "Bash(dotnet ef *)",
+      "Bash(dotnet tool *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5080/)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 5080 -State Listen -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Id $_ -Force }; Write-Output \"stopped\")",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(sqlcmd -?)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(sqlcmd -S \"\\(localdb\\)\\\\MSSQLLocalDB\" -d InventoryManagementSystemDb -E -Q \"DELETE FROM StockTransactions WHERE Note = 'Verification restock via Claude Code'; UPDATE Products SET Quantity = 500 WHERE Id = 3 AND Name = 'Wireless Mouse'; SELECT \\(SELECT COUNT\\(*\\) FROM StockTransactions\\) AS TxCount, \\(SELECT Quantity FROM Products WHERE Id=3\\) AS MouseQty;\")",
+      "Bash(ls \"C:/Users/georg/.claude/projects/C--Users-georg-Downloads-InventoryManagementSystem/memory/\")",
+      "Bash(cat \"C:/Users/georg/.claude/projects/C--Users-georg-Downloads-InventoryManagementSystem/memory/MEMORY.md\")",
+      "Bash(sqllocaldb start *)",
+      "Bash(sqlcmd -S \"\\(localdb\\)\\\\MSSQLLocalDB\" -E -Q \"SELECT @@VERSION;\")",
+      "Bash(rm -f InventoryManagementSystem.Data/Migrations/20260602062615_InitialCreate.Designer.cs InventoryManagementSystem.Data/Migrations/20260602062615_InitialCreate.cs InventoryManagementSystem.Data/Migrations/InventoryDbContextModelSnapshot.cs)",
+      "Bash(ls InventoryManagementSystem.Data/Migrations/)",
+      "PowerShell($p = Get-Process -Id 12756 -ErrorAction SilentlyContinue; if \\($p\\) { Write-Output \\(\"Stopping: \" + $p.ProcessName + \" \\(Id \" + $p.Id + \"\\)\"\\); Stop-Process -Id 12756 -Force; Write-Output \"stopped\" } else { Write-Output \"process 12756 not running\" })",
+      "Bash(npm root *)",
+      "Bash(npm ls *)",
+      "Bash(mkdir -p /c/Users/georg/Downloads/_pptbuild)",
+      "Read(//c/Users/georg/Downloads/**)",
+      "Bash(npm init *)",
+      "Bash(npm install *)"
     ]
   }
 }

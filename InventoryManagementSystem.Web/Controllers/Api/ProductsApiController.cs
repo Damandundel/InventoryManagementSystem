@@ -1,10 +1,13 @@
+using System.Security.Claims;
 using InventoryManagementSystem.Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagementSystem.Web.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductsApiController : ControllerBase
     {
         private readonly IProductService productService;
@@ -14,17 +17,20 @@ namespace InventoryManagementSystem.Web.Controllers.Api
             this.productService = productService;
         }
 
+        private string OwnerId => User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? throw new InvalidOperationException("Authenticated user has no identifier.");
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var products = await productService.GetAllAsync();
+            var products = await productService.GetAllAsync(OwnerId);
             return Ok(products);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var product = await productService.GetByIdAsync(id);
+            var product = await productService.GetByIdAsync(id, OwnerId);
 
             if (product == null)
             {
@@ -39,11 +45,11 @@ namespace InventoryManagementSystem.Web.Controllers.Api
         {
             if (string.IsNullOrWhiteSpace(query))
             {
-                var all = await productService.GetAllAsync();
+                var all = await productService.GetAllAsync(OwnerId);
                 return Ok(all);
             }
 
-            var products = await productService.SearchAsync(query);
+            var products = await productService.SearchAsync(query, OwnerId);
             return Ok(products);
         }
     }

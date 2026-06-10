@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagementSystem.Web.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly IHomeService homeService;
 
@@ -15,7 +15,7 @@ namespace InventoryManagementSystem.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var data = await homeService.GetDashboardDataAsync();
+            var data = await homeService.GetDashboardDataAsync(OwnerId);
 
             var model = new DashboardViewModel
             {
@@ -34,8 +34,8 @@ namespace InventoryManagementSystem.Web.Controllers
 
         public async Task<IActionResult> Statistics()
         {
-            var data = await homeService.GetDashboardDataAsync();
-            var stats = await homeService.GetStatisticsAsync();
+            var data = await homeService.GetDashboardDataAsync(OwnerId);
+            var stats = await homeService.GetStatisticsAsync(OwnerId);
 
             var model = new StatisticsViewModel
             {
@@ -48,6 +48,7 @@ namespace InventoryManagementSystem.Web.Controllers
                 LowStockCount = data.LowStockProducts.Count(),
                 ByCategory = stats.ByCategory.Select(c => new CategoryBreakdown
                 {
+                    Id = c.Id,
                     Name = c.Name,
                     ProductCount = c.ProductCount,
                     TotalValue = c.TotalValue,
@@ -55,6 +56,7 @@ namespace InventoryManagementSystem.Web.Controllers
                 }),
                 ByWarehouse = stats.ByWarehouse.Select(w => new WarehouseBreakdown
                 {
+                    Id = w.Id,
                     Name = w.Name,
                     Location = w.Location,
                     ProductCount = w.ProductCount,

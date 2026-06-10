@@ -15,11 +15,12 @@ namespace InventoryManagementSystem.Services.Implementations
             this.data = data;
         }
 
-        public async Task<IEnumerable<CategoryServiceModel>> GetAllAsync()
+        public async Task<IEnumerable<CategoryServiceModel>> GetAllAsync(string ownerId)
         {
             return await data.Categories
-                .Where(c => !c.IsDeleted)
+                .Where(c => !c.IsDeleted && c.OwnerId == ownerId)
                 .AsNoTracking()
+                .OrderBy(c => c.Name)
                 .Select(c => new CategoryServiceModel
                 {
                     Id = c.Id,
@@ -30,10 +31,10 @@ namespace InventoryManagementSystem.Services.Implementations
                 .ToListAsync();
         }
 
-        public async Task<CategoryServiceModel?> GetByIdAsync(int id)
+        public async Task<CategoryServiceModel?> GetByIdAsync(int id, string ownerId)
         {
             return await data.Categories
-                .Where(c => !c.IsDeleted && c.Id == id)
+                .Where(c => !c.IsDeleted && c.Id == id && c.OwnerId == ownerId)
                 .AsNoTracking()
                 .Select(c => new CategoryServiceModel
                 {
@@ -45,12 +46,13 @@ namespace InventoryManagementSystem.Services.Implementations
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<int> CreateAsync(string name, string? description)
+        public async Task<int> CreateAsync(string ownerId, string name, string? description)
         {
             var category = new Category
             {
                 Name = name,
-                Description = description
+                Description = description,
+                OwnerId = ownerId
             };
 
             await data.Categories.AddAsync(category);
@@ -59,9 +61,10 @@ namespace InventoryManagementSystem.Services.Implementations
             return category.Id;
         }
 
-        public async Task<bool> EditAsync(int id, string name, string? description)
+        public async Task<bool> EditAsync(int id, string ownerId, string name, string? description)
         {
-            var category = await data.Categories.FindAsync(id);
+            var category = await data.Categories
+                .FirstOrDefaultAsync(c => c.Id == id && c.OwnerId == ownerId);
 
             if (category == null || category.IsDeleted)
             {
@@ -76,9 +79,10 @@ namespace InventoryManagementSystem.Services.Implementations
             return true;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id, string ownerId)
         {
-            var category = await data.Categories.FindAsync(id);
+            var category = await data.Categories
+                .FirstOrDefaultAsync(c => c.Id == id && c.OwnerId == ownerId);
 
             if (category == null || category.IsDeleted)
             {
@@ -91,11 +95,11 @@ namespace InventoryManagementSystem.Services.Implementations
             return true;
         }
 
-        public async Task<bool> ExistsAsync(int id)
+        public async Task<bool> ExistsAsync(int id, string ownerId)
         {
             return await data.Categories
                 .AsNoTracking()
-                .AnyAsync(c => c.Id == id && !c.IsDeleted);
+                .AnyAsync(c => c.Id == id && c.OwnerId == ownerId && !c.IsDeleted);
         }
     }
 }

@@ -21,6 +21,9 @@ namespace InventoryManagementSystem.Data.Models
         [Phone]
         public string PhoneNumber { get; set; } = string.Empty;
 
+        [Required]
+        public string OwnerId { get; set; } = string.Empty;
+
         public bool IsDeleted { get; set; }
 
         public ICollection<Product> Products { get; set; } = new List<Product>();

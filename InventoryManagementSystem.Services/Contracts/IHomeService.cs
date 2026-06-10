@@ -4,7 +4,7 @@ namespace InventoryManagementSystem.Services.Contracts
 {
     public interface IHomeService
     {
-        Task<DashboardServiceModel> GetDashboardDataAsync();
-        Task<StatisticsServiceModel> GetStatisticsAsync();
+        Task<DashboardServiceModel> GetDashboardDataAsync(string ownerId);
+        Task<StatisticsServiceModel> GetStatisticsAsync(string ownerId);
     }
 }

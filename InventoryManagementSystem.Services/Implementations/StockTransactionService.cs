@@ -16,9 +16,10 @@ namespace InventoryManagementSystem.Services.Implementations
             this.data = data;
         }
 
-        public async Task<IEnumerable<StockTransactionServiceModel>> GetAllAsync()
+        public async Task<IEnumerable<StockTransactionServiceModel>> GetAllAsync(string ownerId)
         {
             return await data.StockTransactions
+                .Where(st => st.Product.OwnerId == ownerId)
                 .AsNoTracking()
                 .OrderByDescending(st => st.CreatedOn)
                 .Select(st => new StockTransactionServiceModel
@@ -34,10 +35,10 @@ namespace InventoryManagementSystem.Services.Implementations
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<StockTransactionServiceModel>> GetByProductIdAsync(int productId)
+        public async Task<IEnumerable<StockTransactionServiceModel>> GetByProductIdAsync(int productId, string ownerId)
         {
             return await data.StockTransactions
-                .Where(st => st.ProductId == productId)
+                .Where(st => st.ProductId == productId && st.Product.OwnerId == ownerId)
                 .AsNoTracking()
                 .OrderByDescending(st => st.CreatedOn)
                 .Select(st => new StockTransactionServiceModel
@@ -53,9 +54,10 @@ namespace InventoryManagementSystem.Services.Implementations
                 .ToListAsync();
         }
 
-        public async Task<bool> AddStockAsync(int productId, int quantity, string? note)
+        public async Task<bool> AddStockAsync(int productId, int quantity, string? note, string ownerId)
         {
-            var product = await data.Products.FindAsync(productId);
+            var product = await data.Products
+                .FirstOrDefaultAsync(p => p.Id == productId && p.OwnerId == ownerId);
 
             if (product == null || product.IsDeleted)
             {
@@ -79,9 +81,10 @@ namespace InventoryManagementSystem.Services.Implementations
             return true;
         }
 
-        public async Task<bool> RemoveStockAsync(int productId, int quantity, string? note)
+        public async Task<bool> RemoveStockAsync(int productId, int quantity, string? note, string ownerId)
         {
-            var product = await data.Products.FindAsync(productId);
+            var product = await data.Products
+                .FirstOrDefaultAsync(p => p.Id == productId && p.OwnerId == ownerId);
 
             if (product == null || product.IsDeleted)
             {

@@ -1,47 +1,50 @@
-using InventoryManagementSystem.Data.Constants;
 using InventoryManagementSystem.Services.Constants;
 using InventoryManagementSystem.Services.Contracts;
 using InventoryManagementSystem.Web.ViewModels;
 using InventoryManagementSystem.Web.ViewModels.Product;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagementSystem.Web.Controllers
 {
-    public class ProductsController : Controller
+    public class ProductsController : BaseController
     {
         private readonly IProductService productService;
         private readonly ICategoryService categoryService;
         private readonly ISupplierService supplierService;
         private readonly IWarehouseService warehouseService;
+        private readonly IStockTransactionService stockTransactionService;
 
         public ProductsController(
             IProductService productService,
             ICategoryService categoryService,
             ISupplierService supplierService,
-            IWarehouseService warehouseService)
+            IWarehouseService warehouseService,
+            IStockTransactionService stockTransactionService)
         {
             this.productService = productService;
             this.categoryService = categoryService;
             this.supplierService = supplierService;
             this.warehouseService = warehouseService;
+            this.stockTransactionService = stockTransactionService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var products = await productService.GetAllAsync();
+            var products = await productService.GetAllAsync(OwnerId);
             return View(products);
         }
 
         public async Task<IActionResult> Details(int id)
         {
-            var product = await productService.GetByIdAsync(id);
+            var product = await productService.GetByIdAsync(id, OwnerId);
 
             if (product == null)
             {
                 TempData["Error"] = string.Format(MessageConstants.ErrorNotFound, "product");
                 return RedirectToAction(nameof(Index));
             }
+
+            var transactions = await stockTransactionService.GetByProductIdAsync(id, OwnerId);
 
             var model = new ProductDetailsViewModel
             {
@@ -50,15 +53,18 @@ namespace InventoryManagementSystem.Web.Controllers
                 Description = product.Description,
                 Price = product.Price,
                 Quantity = product.Quantity,
+                CategoryId = product.CategoryId,
                 CategoryName = product.CategoryName,
+                SupplierId = product.SupplierId,
                 SupplierName = product.SupplierName,
-                WarehouseName = product.WarehouseName
+                WarehouseId = product.WarehouseId,
+                WarehouseName = product.WarehouseName,
+                Transactions = transactions
             };
 
             return View(model);
         }
 
-        [Authorize(Roles = RoleConstants.Administrator)]
         public async Task<IActionResult> Create()
         {
             var model = new ProductFormViewModel();
@@ -67,7 +73,6 @@ namespace InventoryManagementSystem.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleConstants.Administrator)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductFormViewModel model)
         {
@@ -78,7 +83,7 @@ namespace InventoryManagementSystem.Web.Controllers
             }
 
             await productService.CreateAsync(
-                model.Name, model.Description, model.Price,
+                OwnerId, model.Name, model.Description, model.Price,
                 model.Quantity, model.CategoryId, model.SupplierId, model.WarehouseId);
 
             TempData["Success"] = string.Format(MessageConstants.SuccessCreate, "Product");
@@ -86,10 +91,9 @@ namespace InventoryManagementSystem.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = RoleConstants.Administrator)]
         public async Task<IActionResult> Edit(int id)
         {
-            var product = await productService.GetByIdAsync(id);
+            var product = await productService.GetByIdAsync(id, OwnerId);
 
             if (product == null)
             {
@@ -115,7 +119,6 @@ namespace InventoryManagementSystem.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleConstants.Administrator)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ProductFormViewModel model)
         {
@@ -126,7 +129,7 @@ namespace InventoryManagementSystem.Web.Controllers
             }
 
             var result = await productService.EditAsync(
-                id, model.Name, model.Description, model.Price,
+                id, OwnerId, model.Name, model.Description, model.Price,
                 model.Quantity, model.CategoryId, model.SupplierId, model.WarehouseId);
 
             if (!result)
@@ -140,10 +143,9 @@ namespace InventoryManagementSystem.Web.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
-        [Authorize(Roles = RoleConstants.Administrator)]
         public async Task<IActionResult> Delete(int id)
         {
-            var product = await productService.GetByIdAsync(id);
+            var product = await productService.GetByIdAsync(id, OwnerId);
 
             if (product == null)
             {
@@ -163,11 +165,10 @@ namespace InventoryManagementSystem.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleConstants.Administrator)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var result = await productService.DeleteAsync(id);
+            var result = await productService.DeleteAsync(id, OwnerId);
 
             if (!result)
             {
@@ -182,9 +183,9 @@ namespace InventoryManagementSystem.Web.Controllers
 
         private async Task PopulateDropdowns(ProductFormViewModel model)
         {
-            var categories = await categoryService.GetAllAsync();
-            var suppliers = await supplierService.GetAllAsync();
-            var warehouses = await warehouseService.GetAllAsync();
+            var categories = await categoryService.GetAllAsync(OwnerId);
+            var suppliers = await supplierService.GetAllAsync(OwnerId);
+            var warehouses = await warehouseService.GetAllAsync(OwnerId);
 
             model.Categories = categories.Select(c => new CategoryDropdownViewModel { Id = c.Id, Name = c.Name });
             model.Suppliers = suppliers.Select(s => new SupplierDropdownViewModel { Id = s.Id, Name = s.Name });

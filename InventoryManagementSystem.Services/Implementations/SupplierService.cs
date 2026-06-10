@@ -15,11 +15,12 @@ namespace InventoryManagementSystem.Services.Implementations
             this.data = data;
         }
 
-        public async Task<IEnumerable<SupplierServiceModel>> GetAllAsync()
+        public async Task<IEnumerable<SupplierServiceModel>> GetAllAsync(string ownerId)
         {
             return await data.Suppliers
-                .Where(s => !s.IsDeleted)
+                .Where(s => !s.IsDeleted && s.OwnerId == ownerId)
                 .AsNoTracking()
+                .OrderBy(s => s.Name)
                 .Select(s => new SupplierServiceModel
                 {
                     Id = s.Id,
@@ -31,10 +32,10 @@ namespace InventoryManagementSystem.Services.Implementations
                 .ToListAsync();
         }
 
-        public async Task<SupplierServiceModel?> GetByIdAsync(int id)
+        public async Task<SupplierServiceModel?> GetByIdAsync(int id, string ownerId)
         {
             return await data.Suppliers
-                .Where(s => !s.IsDeleted && s.Id == id)
+                .Where(s => !s.IsDeleted && s.Id == id && s.OwnerId == ownerId)
                 .AsNoTracking()
                 .Select(s => new SupplierServiceModel
                 {
@@ -47,13 +48,14 @@ namespace InventoryManagementSystem.Services.Implementations
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<int> CreateAsync(string name, string email, string phoneNumber)
+        public async Task<int> CreateAsync(string ownerId, string name, string email, string phoneNumber)
         {
             var supplier = new Supplier
             {
                 Name = name,
                 Email = email,
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                OwnerId = ownerId
             };
 
             await data.Suppliers.AddAsync(supplier);
@@ -62,9 +64,10 @@ namespace InventoryManagementSystem.Services.Implementations
             return supplier.Id;
         }
 
-        public async Task<bool> EditAsync(int id, string name, string email, string phoneNumber)
+        public async Task<bool> EditAsync(int id, string ownerId, string name, string email, string phoneNumber)
         {
-            var supplier = await data.Suppliers.FindAsync(id);
+            var supplier = await data.Suppliers
+                .FirstOrDefaultAsync(s => s.Id == id && s.OwnerId == ownerId);
 
             if (supplier == null || supplier.IsDeleted)
             {
@@ -80,9 +83,10 @@ namespace InventoryManagementSystem.Services.Implementations
             return true;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id, string ownerId)
         {
-            var supplier = await data.Suppliers.FindAsync(id);
+            var supplier = await data.Suppliers
+                .FirstOrDefaultAsync(s => s.Id == id && s.OwnerId == ownerId);
 
             if (supplier == null || supplier.IsDeleted)
             {
@@ -95,11 +99,11 @@ namespace InventoryManagementSystem.Services.Implementations
             return true;
         }
 
-        public async Task<bool> ExistsAsync(int id)
+        public async Task<bool> ExistsAsync(int id, string ownerId)
         {
             return await data.Suppliers
                 .AsNoTracking()
-                .AnyAsync(s => s.Id == id && !s.IsDeleted);
+                .AnyAsync(s => s.Id == id && s.OwnerId == ownerId && !s.IsDeleted);
         }
     }
 }

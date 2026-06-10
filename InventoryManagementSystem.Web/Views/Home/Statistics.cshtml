@@ -114,9 +114,10 @@
                     @foreach (var cat in Model.ByCategory)
                     {
                         var pct = totalCatValue > 0 ? (cat.TotalValue / totalCatValue * 100) : 0;
-                        <tr>
+                        <tr class="clickable-row" data-href="@Url.Action("Details", "Categories", new { id = cat.Id })">
                             <td class="fw-semibold">
-                                <i class="bi bi-tag me-1" style="color: var(--accent);"></i>@cat.Name
+                                <i class="bi bi-tag me-1" style="color: var(--accent);"></i>
+                                <a class="entity-link" asp-controller="Categories" asp-action="Details" asp-route-id="@cat.Id">@cat.Name</a>
                             </td>
                             <td><span class="badge bg-info">@cat.ProductCount</span></td>
                             <td>@cat.TotalQuantity.ToString("N0")</td>
@@ -163,9 +164,10 @@
                     @foreach (var wh in Model.ByWarehouse)
                     {
                         var pct = totalWhValue > 0 ? (wh.TotalValue / totalWhValue * 100) : 0;
-                        <tr>
+                        <tr class="clickable-row" data-href="@Url.Action("Details", "Warehouses", new { id = wh.Id })">
                             <td class="fw-semibold">
-                                <i class="bi bi-building me-1" style="color: var(--green);"></i>@wh.Name
+                                <i class="bi bi-building me-1" style="color: var(--green);"></i>
+                                <a class="entity-link" asp-controller="Warehouses" asp-action="Details" asp-route-id="@wh.Id">@wh.Name</a>
                             </td>
                             <td style="color: var(--text-2);">@wh.Location</td>
                             <td><span class="badge bg-info">@wh.ProductCount</span></td>
@@ -211,7 +213,7 @@
                     @{ var rank = 1; }
                     @foreach (var p in Model.TopProductsByValue)
                     {
-                        <tr>
+                        <tr class="clickable-row" data-href="@Url.Action("Details", "Products", new { id = p.Id })">
                             <td>
                                 @if (rank <= 3)
                                 {
@@ -224,7 +226,9 @@
                                     <span class="badge bg-secondary">@rank</span>
                                 }
                             </td>
-                            <td class="fw-semibold">@p.Name</td>
+                            <td class="fw-semibold">
+                                <a class="entity-link" asp-controller="Products" asp-action="Details" asp-route-id="@p.Id">@p.Name</a>
+                            </td>
                             <td><span class="badge bg-info">@p.CategoryName</span></td>
                             <td>@p.Price.ToString("C")</td>
                             <td>@p.Quantity.ToString("N0")</td>

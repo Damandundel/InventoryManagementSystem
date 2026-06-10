@@ -1,0 +1,133 @@
+@model WarehouseDetailsViewModel
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index"><i class="bi bi-building me-1"></i>Warehouses</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+    </ol>
+</nav>
+
+<div class="page-header">
+    <h1><i class="bi bi-building me-2"></i>@Model.Name</h1>
+    <div class="d-flex gap-2">
+        <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model.Id"><i class="bi bi-pencil me-1"></i> Edit</a>
+        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@Model.Id"><i class="bi bi-trash me-1"></i> Delete</a>
+        <a class="btn btn-outline-secondary" asp-action="Index"><i class="bi bi-arrow-left me-1"></i> Back</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4 animate-in">
+        <div class="stat-card stat-purple">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-label">Products Stored</div>
+                    <div class="stat-value">@Model.ProductCount</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 animate-in">
+        <div class="stat-card stat-pink">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-label">Total Quantity</div>
+                    <div class="stat-value">@Model.TotalQuantity.ToString("N0")</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-archive"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 animate-in">
+        <div class="stat-card stat-orange">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-label">Total Value</div>
+                    <div class="stat-value" style="font-size:1.3rem;">@Model.TotalValue.ToString("C")</div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-currency-dollar"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body p-4">
+        <dl class="row mb-0">
+            <dt class="col-sm-3"><i class="bi bi-geo-alt me-1"></i> Location</dt>
+            <dd class="col-sm-9">
+                <a class="entity-link" target="_blank" rel="noopener"
+                   href="https://www.google.com/maps/search/?api=1&query=@Uri.EscapeDataString(Model.Location)">
+                    @Model.Location <i class="bi bi-box-arrow-up-right" style="font-size:.75rem;"></i>
+                </a>
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-box-seam me-2"></i>Products in this Warehouse</h5>
+            <span class="badge bg-info">@Model.ProductCount items</span>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Products.Any())
+        {
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Supplier</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.Products)
+                    {
+                        <tr class="clickable-row" data-href="@Url.Action("Details", "Products", new { id = p.Id })">
+                            <td class="fw-semibold">@p.Name</td>
+                            <td>
+                                <a class="entity-link" asp-controller="Categories" asp-action="Details" asp-route-id="@p.CategoryId">
+                                    <span class="badge bg-info">@p.CategoryName</span>
+                                </a>
+                            </td>
+                            <td>
+                                <a class="entity-link" asp-controller="Suppliers" asp-action="Details" asp-route-id="@p.SupplierId">@p.SupplierName</a>
+                            </td>
+                            <td class="fw-semibold">@p.Price.ToString("C")</td>
+                            <td>
+                                @if (p.Quantity < 10)
+                                {
+                                    <span class="badge bg-danger">@p.Quantity</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">@p.Quantity</span>
+                                }
+                            </td>
+                            <td>
+                                <a class="btn btn-sm btn-info" asp-controller="Products" asp-action="Details" asp-route-id="@p.Id"><i class="bi bi-eye"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="p-4 text-center" style="color: var(--text-3);">
+                <i class="bi bi-inbox" style="font-size:1.8rem;"></i>
+                <p class="mb-0 mt-2">No products in this warehouse yet.</p>
+            </div>
+        }
+    </div>
+</div>

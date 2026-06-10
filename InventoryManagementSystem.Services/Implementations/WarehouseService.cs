@@ -15,11 +15,12 @@ namespace InventoryManagementSystem.Services.Implementations
             this.data = data;
         }
 
-        public async Task<IEnumerable<WarehouseServiceModel>> GetAllAsync()
+        public async Task<IEnumerable<WarehouseServiceModel>> GetAllAsync(string ownerId)
         {
             return await data.Warehouses
-                .Where(w => !w.IsDeleted)
+                .Where(w => !w.IsDeleted && w.OwnerId == ownerId)
                 .AsNoTracking()
+                .OrderBy(w => w.Name)
                 .Select(w => new WarehouseServiceModel
                 {
                     Id = w.Id,
@@ -30,10 +31,10 @@ namespace InventoryManagementSystem.Services.Implementations
                 .ToListAsync();
         }
 
-        public async Task<WarehouseServiceModel?> GetByIdAsync(int id)
+        public async Task<WarehouseServiceModel?> GetByIdAsync(int id, string ownerId)
         {
             return await data.Warehouses
-                .Where(w => !w.IsDeleted && w.Id == id)
+                .Where(w => !w.IsDeleted && w.Id == id && w.OwnerId == ownerId)
                 .AsNoTracking()
                 .Select(w => new WarehouseServiceModel
                 {
@@ -45,12 +46,13 @@ namespace InventoryManagementSystem.Services.Implementations
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<int> CreateAsync(string name, string location)
+        public async Task<int> CreateAsync(string ownerId, string name, string location)
         {
             var warehouse = new Warehouse
             {
                 Name = name,
-                Location = location
+                Location = location,
+                OwnerId = ownerId
             };
 
             await data.Warehouses.AddAsync(warehouse);
@@ -59,9 +61,10 @@ namespace InventoryManagementSystem.Services.Implementations
             return warehouse.Id;
         }
 
-        public async Task<bool> EditAsync(int id, string name, string location)
+        public async Task<bool> EditAsync(int id, string ownerId, string name, string location)
         {
-            var warehouse = await data.Warehouses.FindAsync(id);
+            var warehouse = await data.Warehouses
+                .FirstOrDefaultAsync(w => w.Id == id && w.OwnerId == ownerId);
 
             if (warehouse == null || warehouse.IsDeleted)
             {
@@ -76,9 +79,10 @@ namespace InventoryManagementSystem.Services.Implementations
             return true;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id, string ownerId)
         {
-            var warehouse = await data.Warehouses.FindAsync(id);
+            var warehouse = await data.Warehouses
+                .FirstOrDefaultAsync(w => w.Id == id && w.OwnerId == ownerId);
 
             if (warehouse == null || warehouse.IsDeleted)
             {
@@ -91,11 +95,11 @@ namespace InventoryManagementSystem.Services.Implementations
             return true;
         }
 
-        public async Task<bool> ExistsAsync(int id)
+        public async Task<bool> ExistsAsync(int id, string ownerId)
         {
             return await data.Warehouses
                 .AsNoTracking()
-                .AnyAsync(w => w.Id == id && !w.IsDeleted);
+                .AnyAsync(w => w.Id == id && w.OwnerId == ownerId && !w.IsDeleted);
         }
     }
 }
