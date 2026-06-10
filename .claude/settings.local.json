@@ -38,7 +38,15 @@
       "Bash(mkdir -p /c/Users/georg/Downloads/_pptbuild)",
       "Read(//c/Users/georg/Downloads/**)",
       "Bash(npm init *)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(node deck.js)",
+      "Bash(python -c \"import PIL; print\\('PIL', PIL.__version__\\)\")",
+      "Bash(timeout 180 python /c/Users/georg/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/46bb2b21-d2cd-4b88-8f13-73bdfc52bd6f/e4e3ff2d-ce19-403b-87a5-165864dc8401/skills/pptx/scripts/office/soffice.py --headless --convert-to pdf deck.pptx)",
+      "Bash(python -c \"import pptx; print\\('python-pptx', pptx.__version__\\)\")",
+      "Bash(pip install *)",
+      "Bash(python -c ' *)",
+      "Bash(PYTHONIOENCODING=utf-8 python -c ' *)",
+      "Bash(awk '{print $5, $9}')"
     ]
   }
 }
